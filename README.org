@@ -11,3 +11,4 @@
    - click
    - icecream
    - stackprinter
+   - pyyaml
