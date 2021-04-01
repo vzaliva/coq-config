@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
-import os, subprocess
+import os
+import sys
+import subprocess
 from cerberus import Validator
 from icecream import ic
-
+import click
 import stackprinter
-stackprinter.set_excepthook(style='darkbg2')
 
 from yaml import load
 try:
@@ -13,23 +14,23 @@ try:
 except ImportError:
     from yaml import Loader
 
-import click
+stackprinter.set_excepthook(style='darkbg2')
 
 SCHEMA = {
     'opam': {
         'required': True,
         'type': 'dict',
         'schema': {
-                    'switch': {
-                        'required': True,
-                        'type': 'string',
-                    },
-                    'compiler': {
-                        'required': True,
-                        'type': 'string',
-                    }
-                }
+            'switch': {
+                'required': True,
+                'type': 'string',
             },
+            'compiler': {
+                'required': True,
+                'type': 'string',
+            }
+        }
+    },
     'dependencies' : {
         'type': 'list',
         'required': False,
@@ -75,7 +76,7 @@ SCHEMA = {
     }
 }
 
-CONFIG   = "coq_config.yaml"
+CONFIG = "coq_config.yaml"
 OPAMROOM = "~/.opam"
 
 def opam_get_switches(verbose):
@@ -87,7 +88,7 @@ def opam_get_switches(verbose):
     except:
         print("Error getting list of OPAM switches")
         stackprinter.show()
-        exit(2)
+        sys.exit(2)
     return list(map(str.strip, switches.split('\n')))
 
 
@@ -97,12 +98,12 @@ def opam_check(verbose):
         print("Checking OPAM presence")
     if not os.path.exists(os.path.expanduser(OPAMROOM)):
         print("OPAM is not initialized. Please set up OPAM with `opam init`.")
-        exit(2)
+        sys.exit(2)
 
 def load_config(verbose):
     if not os.path.exists(CONFIG):
         print("'%s' not found" % CONFIG)
-        exit(1)
+        sys.exit(1)
     if verbose:
         print("Loading '%s'" % CONFIG)
     try:
@@ -112,18 +113,18 @@ def load_config(verbose):
             if not v.validate(cfg, SCHEMA):
                 print("Invalid config '%s'" % CONFIG)
                 print(v.errors)
-                exit(1)
+                sys.exit(1)
             else:
                 return cfg
     except:
         print("Error reading '%s'" % CONFIG)
         stackprinter.show()
-        exit(1)
+        sys.exit(1)
 
 def opam_switch_create(verbose, dry_run, switch, compiler):
     if verbose:
         print("Creating switch '%s'" % switch)
-    cmd =["opam", "switch", "create", "--no-switch", switch, compiler]
+        cmd = ["opam", "switch", "create", "--no-switch", switch, compiler]
     try:
         if dry_run:
             print("DRY RUN: %s" % " ".join(cmd))
@@ -134,8 +135,8 @@ def opam_switch_create(verbose, dry_run, switch, compiler):
     except:
         print("Error creating OPAM switch")
         stackprinter.show()
-        exit(3)
-        
+        sys.exit(3)
+
 @click.command()
 @click.version_option("1.0")
 @click.option("--verbose", "-v", is_flag=True, help="Enables verbose mode.")
@@ -153,9 +154,9 @@ def main(verbose, dry_run):
             print("Switch '%s' found" % switch)
     else:
         opam_switch_create(verbose, dry_run, switch, cfg['opam']['compiler'])
-        
-    exit(0)
-    
-if __name__ == '__main__':
-    main()
 
+    sys.exit(0)
+
+if __name__ == '__main__':
+    # pylint: disable=no-value-for-parameter
+    main()
