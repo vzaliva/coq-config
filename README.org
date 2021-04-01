@@ -1,0 +1,13 @@
+* Coq-config
+
+  Simple script to set up a Coq project dependencies using OPAM.
+  Inspired by Haskell stack
+
+** Documentation
+   
+   reads ~coq_config.yaml~ file.
+
+** Dependencies
+   - click
+   - icecream
+   - stackprinter
