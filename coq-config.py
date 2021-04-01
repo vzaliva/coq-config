@@ -80,7 +80,6 @@ CONFIG = "coq_config.yaml"
 OPAMROOM = "~/.opam"
 
 def opam_get_switches(verbose):
-    # Check if switch exists
     if verbose:
         print("Checking OPAM switches")
     try:
@@ -90,6 +89,17 @@ def opam_get_switches(verbose):
         stackprinter.show()
         sys.exit(2)
     return list(map(str.strip, switches.split('\n')))
+
+def opam_get_repositoris(verbose, switch):
+    if verbose:
+        print("Checking OPAM repositories")
+    try:
+        repos = subprocess.check_output(["opam", "repo", "list", "-s", ("--on-switches=%s"%switch)], text=True)
+    except:
+        print("Error getting list of OPAM repositories")
+        stackprinter.show()
+        sys.exit(2)
+    return list(map(str.strip, repos.split('\n')))
 
 
 def opam_check(verbose):
@@ -137,15 +147,28 @@ def opam_switch_create(verbose, dry_run, switch, compiler):
         stackprinter.show()
         sys.exit(3)
 
+def opam_repo_add(verbose, dry_run, switch, rn, ra):
+    if verbose:
+        print("Adding repository '%s'" % rn)
+        cmd = ["opam", "repo", "add", rn, ra, ("--on-switches=%s"%switch)]
+    try:
+        if dry_run:
+            print("DRY RUN: %s" % " ".join(cmd))
+        else:
+            subprocess.check_call(cmd)
+        if verbose:
+            print("Repository '%s' successfully created" % rn)
+    except:
+        print("Error adding OPAM repository")
+        stackprinter.show()
+        sys.exit(3)
+        
 @click.command()
 @click.version_option("1.0")
 @click.option("--verbose", "-v", is_flag=True, help="Enables verbose mode.")
 @click.option("--dry-run", "-n", is_flag=True, help="Do not modify anything.")
 def main(verbose, dry_run):
-
     cfg = load_config(verbose)
-    ic(cfg)
-
     opam_check(verbose)
     switches = opam_get_switches(verbose)
     switch = cfg['opam']['switch']
@@ -154,6 +177,16 @@ def main(verbose, dry_run):
             print("Switch '%s' found" % switch)
     else:
         opam_switch_create(verbose, dry_run, switch, cfg['opam']['compiler'])
+
+    repos = opam_get_repositoris(verbose, switch)
+    ic(repos)
+    for r in cfg['repositories']:
+        rn = r['name']
+        if rn in repos:
+            if verbose:
+                print("Repository '%s' found" % rn)
+        else:
+            opam_repo_add(verbose, dry_run, switch, rn, r['address'])
 
     sys.exit(0)
 
