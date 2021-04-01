@@ -12,3 +12,4 @@
    - icecream
    - stackprinter
    - pyyaml
+   - cerberus
