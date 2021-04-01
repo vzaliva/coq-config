@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os
+import os, subprocess
 from icecream import ic
 
 import stackprinter
@@ -14,7 +14,8 @@ except ImportError:
 
 import click
 
-CONFIG='coq_config.yaml'
+CONFIG   = "coq_config.yaml"
+OPAMROOM = "~/.opam"
 
 @click.command()
 @click.version_option("1.0")
@@ -31,10 +32,29 @@ def main(verbose, dry_run):
             cfg = load(f, Loader=Loader)
     except:
         print("Error reading %s" % CONFIG)
+        stackprinter.show()
         exit(1)
         
     ic(cfg)
-        
+
+    # Check if opam initialized
+    if verbose:
+        print("Checking OPAM")
+    if not os.path.exists(os.path.expanduser(OPAMROOM)):
+        print("OPAM is not initialized. Please set up OPAM with `opam init`.")
+        exit(2)
+
+    # Check if switch exists
+    if verbose:
+        print("Checking OPAM switches")
+    try:
+        switches = subprocess.check_output(["opam", "switch", "list", "-s"], text=True)
+    except:
+        print("Error getting list of OPAM switches")
+        stackprinter.show()
+        exit(2)
+    switchesl = switches.split('\n')
+    ic(switchesl)
     
 if __name__ == '__main__':
     main()
