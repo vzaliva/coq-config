@@ -243,7 +243,7 @@ def main(verbose, dry_run, config):
         opam_switch_create(verbose, dry_run, switch, cfg['opam']['compiler'])
 
     repos = opam_get_repositoris(verbose, switch)
-    for r in cfg['repositories']:
+    for r in cfg.get('repositories',[]):
         rn = r['name']
         if rn in repos:
             if verbose:
@@ -251,9 +251,9 @@ def main(verbose, dry_run, config):
         else:
             opam_repo_add(verbose, dry_run, switch, rn, r['address'])
 
-    opam_install_packages(verbose, dry_run, switch, cfg['dependencies'])
+    opam_install_packages(verbose, dry_run, switch, cfg.get('dependencies',[]))
 
-    for d in cfg['extra-deps']:
+    for d in cfg.get('extra-deps',[]):
         p = d['path']
         rs = d.get('recurse-submodules', False)
         if not os.path.exists(p):
