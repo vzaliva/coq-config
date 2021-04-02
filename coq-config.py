@@ -162,6 +162,24 @@ def opam_repo_add(verbose, dry_run, switch, rn, ra):
         print("Error adding OPAM repository")
         stackprinter.show()
         sys.exit(3)
+
+def opam_install_packages(verbose, dry_run, switch, packages):
+    pkgs = " ".join(packages)
+    if verbose:
+        print("Installing: %s" % pkgs)
+    try:
+        if dry_run:
+            cmd = ["opam", "install", "--dry-run", ("--switch=%s"%switch)] + packages
+            #print("DRY RUN: %s" % " ".join(cmd))
+        else:
+            cmd = ["opam", "install", "--yes", ("--switch=%s"%switch)] + packages
+        subprocess.check_call(cmd)
+        if verbose:
+            print("Installed: %s" % pkgs)
+    except:
+        print("Error installing pakages")
+        stackprinter.show()
+        sys.exit(3)
         
 @click.command()
 @click.version_option("1.0")
@@ -188,6 +206,8 @@ def main(verbose, dry_run):
         else:
             opam_repo_add(verbose, dry_run, switch, rn, r['address'])
 
+    opam_install_packages(verbose, dry_run, switch, cfg['dependencies'])
+            
     sys.exit(0)
 
 if __name__ == '__main__':

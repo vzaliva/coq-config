@@ -4,12 +4,29 @@
   Inspired by Haskell stack
 
 ** Documentation
-   
-   reads ~coq_config.yaml~ file.
+   Reads ~coq_config.yaml~ file and set up am /opam/ /switch/ and install
+   required packages.
+
+   Optionally checks out some sub-projects from /git/ (an alternative
+   to using sub-modules)
+
+** TODO
+   - [ ] Run ~opam init~ is necessary
+   - [ ] If switch exists, check if the right compiler is used and
+     update if necessary.
+   - [ ] When adding repositories, check their URLs, not just names.
+     It they do not match the config - report errror.
+   - for all ~extra-deps~
+     Check if ~path~ exists:
+     no: ~git clone~
+     yes: git pull; git checkout ~commit~
 
 ** Dependencies
+*** Python packages (install with ~pip~):   
    - click
    - icecream
    - stackprinter
    - pyyaml
    - cerberus
+*** ~opam~ 
+    Tested with verson 2.0.5.
