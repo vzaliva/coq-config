@@ -131,7 +131,7 @@ def load_config(verbose, cfgfile):
 def opam_switch_create(verbose, dry_run, switch, compiler):
     if verbose:
         print("Creating switch '%s'" % switch)
-        cmd = ["opam", "switch", "create", "--no-switch", switch, compiler]
+    cmd = ["opam", "switch", "create", "--no-switch", switch, compiler]
     try:
         if dry_run:
             print("DRY RUN: %s" % " ".join(cmd))
@@ -146,7 +146,7 @@ def opam_switch_create(verbose, dry_run, switch, compiler):
 def opam_repo_add(verbose, dry_run, switch, rn, ra):
     if verbose:
         print("Adding repository '%s'" % rn)
-        cmd = ["opam", "repo", "add", rn, ra, ("--on-switches=%s"%switch)]
+    cmd = ["opam", "repo", "add", rn, ra, ("--on-switches=%s"%switch)]
     try:
         if dry_run:
             print("DRY RUN: %s" % " ".join(cmd))
@@ -178,10 +178,10 @@ def opam_install_packages(verbose, dry_run, switch, packages):
 def git_clone(verbose, dry_run, path, git_url, rs):
     if verbose:
         print("Cloning from git '%s'" % git_url)
-        if rs:
-            cmd = ["git", "clone", "--recurse-submodules", git_url, path]
-        else:
-            cmd = ["git", "clone", "-n", git_url, path]
+    if rs:
+        cmd = ["git", "clone", "--recurse-submodules", git_url, path]
+    else:
+        cmd = ["git", "clone", "-n", git_url, path]
     try:
         if dry_run:
             print("DRY RUN: %s" % " ".join(cmd))
@@ -196,11 +196,11 @@ def git_clone(verbose, dry_run, path, git_url, rs):
 def git_checkout(verbose, dry_run, path, commit, rs):
     if verbose:
         print("Checking out at '%s'" % path)
-        cmd = ["git", "checkout"]
-        if rs:
-            cmd.append("--recurse-submodules")
-        if commit is not None:
-            cmd.append(commit)
+    cmd = ["git", "checkout"]
+    if rs:
+        cmd.append("--recurse-submodules")
+    if commit is not None:
+        cmd.append(commit)
     try:
         if dry_run:
             print("DRY RUN: %s" % " ".join(cmd))
