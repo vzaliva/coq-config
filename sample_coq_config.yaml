@@ -34,5 +34,6 @@ dependencies:
 
 extra-deps:
   - git: https://github.com/vellvm/vellvm.git
+    recurse-submodules: yes
     commit: 5a25d5b6a92aad2f572a336096c5bf98af9f2314
     path: lib/vellvm1
