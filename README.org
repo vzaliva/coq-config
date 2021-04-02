@@ -1,7 +1,7 @@
 * Coq-config
 
-  Simple script to set up a Coq project dependencies using OPAM.
-  Inspired by Haskell stack
+  Simple script to set up a Coq project dependencies using /opam/.
+  Inspired by Haskell's ~stack~
 
 ** Documentation
    Reads ~coq_config.yaml~ file and set up am /opam/ /switch/ and install
@@ -16,7 +16,7 @@
      update if necessary.
    - [ ] When adding repositories, check their URLs, not just names.
      It they do not match the config - report errror.
-   - for all ~extra-deps~
+   - [ ] for all ~extra-deps~
      Check if ~path~ exists:
      no: ~git clone~
      yes: git pull; git checkout ~commit~

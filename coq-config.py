@@ -76,8 +76,7 @@ SCHEMA = {
     }
 }
 
-CONFIG = "coq_config.yaml"
-OPAMROOM = "~/.opam"
+OPAMROOT = "~/.opam"
 
 def opam_get_switches(verbose):
     if verbose:
@@ -106,28 +105,28 @@ def opam_check(verbose):
     # Check if opam initialized
     if verbose:
         print("Checking OPAM presence")
-    if not os.path.exists(os.path.expanduser(OPAMROOM)):
+    if not os.path.exists(os.path.expanduser(OPAMROOT)):
         print("OPAM is not initialized. Please set up OPAM with `opam init`.")
         sys.exit(2)
 
-def load_config(verbose):
-    if not os.path.exists(CONFIG):
-        print("'%s' not found" % CONFIG)
+def load_config(verbose, cfgfile):
+    if not os.path.exists(cfgfile):
+        print("'%s' not found" % cfgfile)
         sys.exit(1)
     if verbose:
-        print("Loading '%s'" % CONFIG)
+        print("Loading '%s'" % cfgfile)
     try:
-        with open(CONFIG, "r") as f:
+        with open(cfgfile, "r") as f:
             cfg = load(f, Loader=Loader)
             v = Validator(SCHEMA)
             if not v.validate(cfg, SCHEMA):
-                print("Invalid config '%s'" % CONFIG)
+                print("Invalid config '%s'" % cfgfile)
                 print(v.errors)
                 sys.exit(1)
             else:
                 return cfg
     except:
-        print("Error reading '%s'" % CONFIG)
+        print("Error reading '%s'" % cfgfile)
         stackprinter.show()
         sys.exit(1)
 
@@ -185,8 +184,9 @@ def opam_install_packages(verbose, dry_run, switch, packages):
 @click.version_option("1.0")
 @click.option("--verbose", "-v", is_flag=True, help="Enables verbose mode.")
 @click.option("--dry-run", "-n", is_flag=True, help="Do not modify anything.")
-def main(verbose, dry_run):
-    cfg = load_config(verbose)
+@click.option('--config', "-f", default="coq_config.yaml", help='Config file name')
+def main(verbose, dry_run, config):
+    cfg = load_config(verbose, config)
     opam_check(verbose)
     switches = opam_get_switches(verbose)
     switch = cfg['opam']['switch']
