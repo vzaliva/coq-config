@@ -4,17 +4,13 @@ import os
 import sys
 import subprocess
 from cerberus import Validator
-from icecream import ic
 import click
-import stackprinter
 
 from yaml import load
 try:
     from yaml import CLoader as Loader
 except ImportError:
     from yaml import Loader
-
-stackprinter.set_excepthook(style='darkbg2')
 
 SCHEMA = {
     'opam': {
@@ -87,9 +83,8 @@ def opam_get_switches(verbose):
         print("Checking OPAM switches")
     try:
         switches = subprocess.check_output(["opam", "switch", "list", "-s"], text=True)
-    except:
+    except subprocess.CalledProcessError:
         print("Error getting list of OPAM switches")
-        stackprinter.show()
         sys.exit(2)
     return list(map(str.strip, switches.split('\n')))
 
@@ -98,9 +93,8 @@ def opam_get_repositoris(verbose, switch):
         print("Checking OPAM repositories")
     try:
         repos = subprocess.check_output(["opam", "repo", "list", "-s", ("--on-switches=%s"%switch)], text=True)
-    except:
+    except subprocess.CalledProcessError:
         print("Error getting list of OPAM repositories")
-        stackprinter.show()
         sys.exit(2)
     return list(map(str.strip, repos.split('\n')))
 
@@ -130,9 +124,8 @@ def load_config(verbose, cfgfile):
             else:
                 return cfg
 
-    except:
+    except: # pylint: disable=bare-except
         print("Error reading '%s'" % cfgfile)
-        stackprinter.show()
         sys.exit(1)
 
 def opam_switch_create(verbose, dry_run, switch, compiler):
@@ -146,9 +139,8 @@ def opam_switch_create(verbose, dry_run, switch, compiler):
             subprocess.check_call(cmd)
         if verbose:
             print("Switch '%s' successfully created" % switch)
-    except:
+    except subprocess.CalledProcessError:
         print("Error creating OPAM switch")
-        stackprinter.show()
         sys.exit(3)
 
 def opam_repo_add(verbose, dry_run, switch, rn, ra):
@@ -162,9 +154,8 @@ def opam_repo_add(verbose, dry_run, switch, rn, ra):
             subprocess.check_call(cmd)
         if verbose:
             print("Repository '%s' successfully created" % rn)
-    except:
+    except subprocess.CalledProcessError:
         print("Error adding OPAM repository")
-        stackprinter.show()
         sys.exit(3)
 
 def opam_install_packages(verbose, dry_run, switch, packages):
@@ -180,9 +171,8 @@ def opam_install_packages(verbose, dry_run, switch, packages):
         subprocess.check_call(cmd)
         if verbose:
             print("Installed: %s" % pkgs)
-    except:
+    except subprocess.CalledProcessError:
         print("Error installing pakages")
-        stackprinter.show()
         sys.exit(3)
 
 def git_clone(verbose, dry_run, path, git_url, rs):
@@ -199,9 +189,8 @@ def git_clone(verbose, dry_run, path, git_url, rs):
             subprocess.check_call(cmd)
         if verbose:
             print("Cloned '%s' to '%s'" % (git_url, path))
-    except:
+    except subprocess.CalledProcessError:
         print("Error performing git clone")
-        stackprinter.show()
         sys.exit(3)
 
 def git_checkout(verbose, dry_run, path, commit, rs):
@@ -219,9 +208,8 @@ def git_checkout(verbose, dry_run, path, commit, rs):
             subprocess.check_call(cmd, cwd=path)
         if verbose:
             print("Checked out at '%s'" % path)
-    except:
+    except subprocess.CalledProcessError:
         print("Error performing git checkout")
-        stackprinter.show()
         sys.exit(3)
         
 CONFIG = "coq_config.yaml"
@@ -251,9 +239,9 @@ def main(verbose, dry_run, config):
         else:
             opam_repo_add(verbose, dry_run, switch, rn, r['address'])
 
-    opam_install_packages(verbose, dry_run, switch, cfg.get('dependencies',[]))
+    opam_install_packages(verbose, dry_run, switch, cfg.get('dependencies', []))
 
-    for d in cfg.get('extra-deps',[]):
+    for d in cfg.get('extra-deps', []):
         p = d['path']
         rs = d.get('recurse-submodules', False)
         if not os.path.exists(p):

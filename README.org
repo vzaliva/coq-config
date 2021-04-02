@@ -21,8 +21,6 @@
 ** Installation
 *** Python packages (install with ~pip~):   
    - click
-   - icecream (used for debugging)
-   - stackprinter
    - pyyaml
    - cerberus
 *** ~opam~ 
