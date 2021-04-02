@@ -16,16 +16,11 @@
      update if necessary.
    - [ ] When adding repositories, check their URLs, not just names.
      It they do not match the config - report errror.
-   - [ ] for all ~extra-deps~
-     Check if ~path~ exists:
-     no: ~git clone~
-     yes: git pull; git checkout ~commit~
    - [ ] Run ~coq-config~ for all ~extra-deps~
 
 ** Dependencies
 *** Python packages (install with ~pip~):   
    - click
-   - icecream
    - stackprinter
    - pyyaml
    - cerberus

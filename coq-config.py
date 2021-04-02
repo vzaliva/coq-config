@@ -180,6 +180,41 @@ def opam_install_packages(verbose, dry_run, switch, packages):
         stackprinter.show()
         sys.exit(3)
 
+def git_clone(verbose, dry_run, path, git_url):
+    if verbose:
+        print("Cloning from git '%s'" % git_url)
+        cmd = ["git", "clone", "-n", git_url, path]
+    try:
+        if dry_run:
+            print("DRY RUN: %s" % " ".join(cmd))
+        else:
+            subprocess.check_call(cmd)
+        if verbose:
+            print("Cloned '%s' to '%s'" % (git_url,path))
+    except:
+        print("Error performing git clone")
+        stackprinter.show()
+        sys.exit(3)
+
+def git_checkout(verbose, dry_run, path, commit):
+    if verbose:
+        print("Checking out at '%s'" % path)
+        if commit is None:
+            cmd = ["git", "checkout"]
+        else:
+            cmd = ["git", "checkout", commit]
+    try:
+        if dry_run:
+            print("DRY RUN: %s" % " ".join(cmd))
+        else:
+            subprocess.check_call(cmd, cwd=path)
+        if verbose:
+            print("Checked out at '%s'" % path)
+    except:
+        print("Error performing git checkout")
+        stackprinter.show()
+        sys.exit(3)
+        
 CONFIG = "coq_config.yaml"
 
 @click.command()
@@ -209,6 +244,12 @@ def main(verbose, dry_run, config):
             opam_repo_add(verbose, dry_run, switch, rn, r['address'])
 
     opam_install_packages(verbose, dry_run, switch, cfg['dependencies'])
+
+    for d in cfg['extra-deps']:
+        p = d['path']
+        if not os.path.exists(p):
+            git_clone(verbose, dry_run, p, d['git'])
+        git_checkout(verbose, dry_run, p, d.get('commit',None))
             
     sys.exit(0)
 
