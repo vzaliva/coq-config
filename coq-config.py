@@ -198,7 +198,7 @@ def git_clone(verbose, dry_run, path, git_url, rs):
         else:
             subprocess.check_call(cmd)
         if verbose:
-            print("Cloned '%s' to '%s'" % (git_url,path))
+            print("Cloned '%s' to '%s'" % (git_url, path))
     except:
         print("Error performing git clone")
         stackprinter.show()
@@ -257,8 +257,8 @@ def main(verbose, dry_run, config):
         p = d['path']
         rs = d.get('recurse-submodules', False)
         if not os.path.exists(p):
-            git_clone(verbose, dry_run, p, d['git'],rs)
-        git_checkout(verbose, dry_run, p, d.get('commit',None),rs)
+            git_clone(verbose, dry_run, p, d['git'], rs)
+        git_checkout(verbose, dry_run, p, d.get('commit', None), rs)
             
     sys.exit(0)
 
