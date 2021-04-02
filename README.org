@@ -10,12 +10,16 @@
    Optionally checks out some sub-projects from /git/ (an alternative
    to using sub-modules).
 
-   It is safe to run multiple times. The /opam/ packages where the
-   version numer was specified, will be pinned, so it is safe to do
-   `opam update` aftewards.
+*** Notes
+   - It is safe to run multiple times. 
+   - The /opam/ packages where the version numer was specified, will be
+     pinned, so it is safe to do `opam update` aftewards.
+   - You will need to activate opam switch specified in config with
+     ~opam switch~ command. The script does not change current active
+     switch for you.
 
-** TODO
-   - [ ] Run ~opam init~ is necessary
+** To-Do
+   - [ ] Run ~opam init~ if necessary
    - [ ] If switch exists, check if the right compiler is used and
      update if necessary.
    - [ ] When adding repositories, check their URLs, not just names.
@@ -30,5 +34,5 @@
    - click
    - pyyaml
    - cerberus
-*** ~opam~ 
-    Tested with verson 2.0.5.
+*** Tested with /opam/ verson 2.0.5.
+    
