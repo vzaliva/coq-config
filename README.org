@@ -20,6 +20,7 @@
      Check if ~path~ exists:
      no: ~git clone~
      yes: git pull; git checkout ~commit~
+   - [ ] Run ~coq-config~ for all ~extra-deps~
 
 ** Dependencies
 *** Python packages (install with ~pip~):   

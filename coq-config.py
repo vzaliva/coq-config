@@ -179,12 +179,14 @@ def opam_install_packages(verbose, dry_run, switch, packages):
         print("Error installing pakages")
         stackprinter.show()
         sys.exit(3)
-        
+
+CONFIG = "coq_config.yaml"
+
 @click.command()
 @click.version_option("1.0")
 @click.option("--verbose", "-v", is_flag=True, help="Enables verbose mode.")
 @click.option("--dry-run", "-n", is_flag=True, help="Do not modify anything.")
-@click.option('--config', "-f", default="coq_config.yaml", help='Config file name')
+@click.option('--config', "-f", default=CONFIG, help='File name to use instead of `%s`'%CONFIG)
 def main(verbose, dry_run, config):
     cfg = load_config(verbose, config)
     opam_check(verbose)
