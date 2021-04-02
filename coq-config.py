@@ -175,6 +175,28 @@ def opam_install_packages(verbose, dry_run, switch, packages):
         print("Error installing pakages")
         sys.exit(3)
 
+def opam_pin_packages(verbose, dry_run, switch, packages):
+    for p in packages:
+        p2 = p.split('.',1)
+        if len(p2)==2:
+            # package has version number
+            pn = p2[0]
+            pv = p2[1]
+            if verbose:
+                print("Pinning: %s" % p)
+            cmd = ["opam", "pin", ("--switch=%s"%switch)]
+            if dry_run:
+                cmd.append("--dry-run")
+            cmd.append(pn)
+            cmd.append(pv)
+            try:
+                subprocess.check_call(cmd)
+                if verbose:
+                    print("Pinned: %s" % p)
+            except subprocess.CalledProcessError:
+                print("Error pinnig pakage")
+                sys.exit(3)
+        
 def git_clone(verbose, dry_run, path, git_url, rs):
     if verbose:
         print("Cloning from git '%s'" % git_url)
@@ -241,6 +263,8 @@ def main(verbose, dry_run, config):
 
     opam_install_packages(verbose, dry_run, switch, cfg.get('dependencies', []))
 
+    opam_pin_packages(verbose, dry_run, switch, cfg.get('dependencies', []))
+    
     for d in cfg.get('extra-deps', []):
         p = d['path']
         rs = d.get('recurse-submodules', False)
