@@ -50,6 +50,10 @@ SCHEMA = {
                     'required': False,
                     'type': 'string',
                 },
+                'recurse-submodules': {
+                    'required': False,
+                    'type': 'boolean',
+                },
                 'path': {
                     'required': True,
                     'type': 'string',
@@ -125,6 +129,7 @@ def load_config(verbose, cfgfile):
                 sys.exit(1)
             else:
                 return cfg
+
     except:
         print("Error reading '%s'" % cfgfile)
         stackprinter.show()
@@ -180,10 +185,13 @@ def opam_install_packages(verbose, dry_run, switch, packages):
         stackprinter.show()
         sys.exit(3)
 
-def git_clone(verbose, dry_run, path, git_url):
+def git_clone(verbose, dry_run, path, git_url, rs):
     if verbose:
         print("Cloning from git '%s'" % git_url)
-        cmd = ["git", "clone", "-n", git_url, path]
+        if rs:
+            cmd = ["git", "clone", "--recurse-submodules", git_url, path]
+        else:
+            cmd = ["git", "clone", "-n", git_url, path]
     try:
         if dry_run:
             print("DRY RUN: %s" % " ".join(cmd))
@@ -196,13 +204,14 @@ def git_clone(verbose, dry_run, path, git_url):
         stackprinter.show()
         sys.exit(3)
 
-def git_checkout(verbose, dry_run, path, commit):
+def git_checkout(verbose, dry_run, path, commit, rs):
     if verbose:
         print("Checking out at '%s'" % path)
-        if commit is None:
-            cmd = ["git", "checkout"]
-        else:
-            cmd = ["git", "checkout", commit]
+        cmd = ["git", "checkout"]
+        if rs:
+            cmd.append("--recurse-submodules")
+        if commit is not None:
+            cmd.append(commit)
     try:
         if dry_run:
             print("DRY RUN: %s" % " ".join(cmd))
@@ -234,7 +243,6 @@ def main(verbose, dry_run, config):
         opam_switch_create(verbose, dry_run, switch, cfg['opam']['compiler'])
 
     repos = opam_get_repositoris(verbose, switch)
-    ic(repos)
     for r in cfg['repositories']:
         rn = r['name']
         if rn in repos:
@@ -247,9 +255,10 @@ def main(verbose, dry_run, config):
 
     for d in cfg['extra-deps']:
         p = d['path']
+        rs = d.get('recurse-submodules', False)
         if not os.path.exists(p):
-            git_clone(verbose, dry_run, p, d['git'])
-        git_checkout(verbose, dry_run, p, d.get('commit',None))
+            git_clone(verbose, dry_run, p, d['git'],rs)
+        git_checkout(verbose, dry_run, p, d.get('commit',None),rs)
             
     sys.exit(0)
 

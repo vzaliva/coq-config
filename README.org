@@ -18,9 +18,10 @@
      It they do not match the config - report errror.
    - [ ] Run ~coq-config~ for all ~extra-deps~
 
-** Dependencies
+** Installation
 *** Python packages (install with ~pip~):   
    - click
+   - icecream (used for debugging)
    - stackprinter
    - pyyaml
    - cerberus
