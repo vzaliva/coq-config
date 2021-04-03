@@ -241,16 +241,26 @@ CONFIG = "coq_config.yaml"
 @click.option("--verbose", "-v", is_flag=True, help="Enables verbose mode.")
 @click.option("--dry-run", "-n", is_flag=True, help="Do not modify anything.")
 @click.option('--config', "-f", default=CONFIG, help='File name to use instead of `%s`'%CONFIG)
-def main(verbose, dry_run, config):
+@click.option('--switch', "-s", help="Use existing switch")
+def main(verbose, dry_run, config, switch):
     cfg = load_config(verbose, config)
     opam_check(verbose)
     switches = opam_get_switches(verbose)
-    switch = cfg['opam']['switch']
-    if switch in switches:
-        if verbose:
-            print("Switch '%s' found" % switch)
+
+    if switch is None:
+        switch = cfg['opam']['switch']
+        if switch in switches:
+            if verbose:
+                print("Switch '%s' found" % switch)
+        else:
+            opam_switch_create(verbose, dry_run, switch, cfg['opam']['compiler'])
     else:
-        opam_switch_create(verbose, dry_run, switch, cfg['opam']['compiler'])
+        if switch in switches:
+            if verbose:
+                print("Using existing switch '%s'" % switch)
+        else:
+            print("Switch does not exist '%s'" % switch)
+            exit(1)
 
     repos = opam_get_repositoris(verbose, switch)
     for r in cfg.get('repositories',[]):
