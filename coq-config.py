@@ -6,6 +6,9 @@ import subprocess
 from cerberus import Validator
 import click
 
+# Uncomment for debugging
+#from icecream import ic
+
 from yaml import load
 try:
     from yaml import CLoader as Loader
@@ -30,7 +33,24 @@ SCHEMA = {
     'dependencies' : {
         'type': 'list',
         'required': False,
-        'schema': {'type': 'string'}
+        'schema': {"anyof":[
+            {'type': 'string'},
+            {'type': 'dict',
+                'schema': {
+                    'name': {
+                        'required': True,
+                        'type': 'string',
+                    },
+                    'kind': {
+                        'required': True,
+                        'type': 'string',
+                    },
+                    'target': {
+                        'required': True,
+                        'type': 'string',
+                    }
+                }}
+        ]}
     },
     'extra-deps' : {
         'type': 'list',
@@ -159,15 +179,16 @@ def opam_repo_add(verbose, dry_run, switch, rn, ra):
         sys.exit(3)
 
 def opam_install_packages(verbose, dry_run, switch, packages):
-    pkgs = " ".join(packages)
+    pnames = [p if type(p) == str else p['name'] for p in packages]
+    pkgs = " ".join(pnames)
     if verbose:
         print("Installing: %s" % pkgs)
     try:
         if dry_run:
-            cmd = ["opam", "install", "--dry-run", ("--switch=%s"%switch)] + packages
+            cmd = ["opam", "install", "--dry-run", "--yes", ("--switch=%s"%switch)] + pnames
             #print("DRY RUN: %s" % " ".join(cmd))
         else:
-            cmd = ["opam", "install", "--yes", ("--switch=%s"%switch)] + packages
+            cmd = ["opam", "install", "--yes", ("--switch=%s"%switch)] + pnames
         subprocess.check_call(cmd)
         if verbose:
             print("Installed: %s" % pkgs)
@@ -177,25 +198,34 @@ def opam_install_packages(verbose, dry_run, switch, packages):
 
 def opam_pin_packages(verbose, dry_run, switch, packages):
     for p in packages:
-        p2 = p.split('.',1)
-        if len(p2)==2:
-            # package has version number
-            pn = p2[0]
-            pv = p2[1]
+        if type(p) == str:
+            p2 = p.split('.',1)
+            if len(p2)==2:
+                # package has version number
+                pn = p2[0]
+                pt = p2[1]
+                pk = "auto"
+            else:
+                next # no pinning required
+        else:
+            pn = p['name']
+            pt = p['target']
+            pk = p['kind']
+        
+        if verbose:
+            print("Pinning: %s" % pn)
+        cmd = ["opam", "pin", "--yes", "--no-action", ("--switch=%s"%switch), ("--kind=%s"%pk)]
+        if dry_run:
+            cmd.append("--dry-run")
+        cmd.append(pn)
+        cmd.append(pt)
+        try:
+            subprocess.check_call(cmd)
             if verbose:
-                print("Pinning: %s" % p)
-            cmd = ["opam", "pin", ("--switch=%s"%switch)]
-            if dry_run:
-                cmd.append("--dry-run")
-            cmd.append(pn)
-            cmd.append(pv)
-            try:
-                subprocess.check_call(cmd)
-                if verbose:
-                    print("Pinned: %s" % p)
-            except subprocess.CalledProcessError:
-                print("Error pinnig pakage")
-                sys.exit(3)
+                print("Pinned: %s" % p)
+        except subprocess.CalledProcessError:
+            print("Error pinnig pakage")
+            sys.exit(3)
         
 def git_clone(verbose, dry_run, path, git_url, rs):
     if verbose:
@@ -271,9 +301,9 @@ def main(verbose, dry_run, config, switch):
         else:
             opam_repo_add(verbose, dry_run, switch, rn, r['address'])
 
-    opam_install_packages(verbose, dry_run, switch, cfg.get('dependencies', []))
-
     opam_pin_packages(verbose, dry_run, switch, cfg.get('dependencies', []))
+    
+    opam_install_packages(verbose, dry_run, switch, cfg.get('dependencies', []))
     
     for d in cfg.get('extra-deps', []):
         p = d['path']

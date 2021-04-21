@@ -31,6 +31,9 @@ dependencies:
   - dune
   - qcheck
   - coq.8.12.2
+  - name: coq-struct-tact
+    kind: git
+    target: https://github.com/uwplse/StructTact.git
 
 extra-deps:
   - git: https://github.com/vellvm/vellvm.git
