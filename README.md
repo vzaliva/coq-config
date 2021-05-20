@@ -49,3 +49,8 @@ To run from local clone of git repository install dependencies (using
 -   cerberus
 
 
+## Contact
+
+For bugs reports, contributions and source code visit [projec page on
+github](https://github.com/vzaliva/coq-config).
+
