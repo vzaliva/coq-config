@@ -23,21 +23,21 @@ to using sub-modules).
 
 ## To-Do
 
--   [ ] Run `opam init` if necessary
--   [ ] If switch exists, check if the right compiler is used and
+-   Run `opam init` if necessary
+-   If switch exists, check if the right compiler is used and
     update if necessary.
--   [ ] When adding repositories, check their URLs, not just names.
+-   When adding repositories, check their URLs, not just names.
     It they do not match the config - report errror.
--   [ ] Run `coq-config` for all `extra-deps`
--   [ ] pass-through "-j" command line option
--   [ ] When re-running, make sure pinned version removed or updated
+-   Run `coq-config` for all `extra-deps`
+-   pass-through "-j" command line option
+-   When re-running, make sure pinned version removed or updated
     if changed.
 
 ## Installation
 
 The easiets way to install is using `pip`:
 
-`pip install coqconfig`
+`pip install coq-config`
 
 ### Manual install
 
