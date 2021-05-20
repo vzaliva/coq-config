@@ -3,7 +3,6 @@
 Simple script to set up a Coq project dependencies using *opam*.
 Inspired by Haskell's `stack`.
 
-
 ## Documentation
 
 Reads `coq_config.yaml` file and set up am *opam* *switch* and install
@@ -20,7 +19,7 @@ to using sub-modules).
 -   You will need to activate opam switch specified in config with
     `opam switch` command. The script does not change current active
     switch for you.
-
+-   Tested with *opam* verson 2.0.5.
 
 ## To-Do
 
@@ -34,15 +33,19 @@ to using sub-modules).
 -   [ ] When re-running, make sure pinned version removed or updated
     if changed.
 
-
 ## Installation
 
-### Python packages (install with `pip`):
+The easiets way to install is using `pip`:
+
+`pip install coqconfig`
+
+### Manual install
+
+To run from local clone of git repository install dependencies (using
+`pip`):
 
 -   click
 -   pyyaml
 -   cerberus
 
-
-### Tested with *opam* verson 2.0.5.
 
