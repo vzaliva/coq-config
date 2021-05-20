@@ -51,6 +51,6 @@ To run from local clone of git repository install dependencies (using
 
 ## Contact
 
-For bugs reports, contributions and source code visit [projec page on
+For bugs reports, contributions and source code visit [project page on
 github](https://github.com/vzaliva/coq-config).
 
