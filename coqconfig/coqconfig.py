@@ -206,7 +206,7 @@ def opam_pin_packages(verbose, dry_run, switch, packages):
                 pt = p2[1]
                 pk = "auto"
             else:
-                next # no pinning required
+                continue # no pinning required
         else:
             pn = p['name']
             pt = p['target']
