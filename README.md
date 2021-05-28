@@ -27,9 +27,8 @@ to using sub-modules).
 -   If switch exists, check if the right compiler is used and
     update if necessary.
 -   When adding repositories, check their URLs, not just names.
-    It they do not match the config - report errror.
+    It they do not match the config - report error.
 -   Run `coq-config` for all `extra-deps`
--   pass-through "-j" command line option
 -   When re-running, make sure pinned version removed or updated
     if changed.
 

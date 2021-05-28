@@ -178,17 +178,20 @@ def opam_repo_add(verbose, dry_run, switch, rn, ra):
         print("Error adding OPAM repository")
         sys.exit(3)
 
-def opam_install_packages(verbose, dry_run, switch, packages):
+def opam_install_packages(verbose, dry_run, jobs, switch, packages):
     pnames = [p if type(p) == str else p['name'] for p in packages]
     pkgs = " ".join(pnames)
     if verbose:
         print("Installing: %s" % pkgs)
     try:
+        cmd = ["opam", "install", "--yes", ("--switch=%s"%switch)]
         if dry_run:
-            cmd = ["opam", "install", "--dry-run", "--yes", ("--switch=%s"%switch)] + pnames
-            #print("DRY RUN: %s" % " ".join(cmd))
-        else:
-            cmd = ["opam", "install", "--yes", ("--switch=%s"%switch)] + pnames
+            cmd.append("--dry-run")
+        if jobs is not None:
+            cmd.append("--jobs=%d" % jobs)
+        cmd.extend(pnames)
+        if verbose and dry_run:
+            print("DRY RUN: %s" % " ".join(cmd))
         subprocess.check_call(cmd)
         if verbose:
             print("Installed: %s" % pkgs)
@@ -268,11 +271,12 @@ CONFIG = "coq_config.yaml"
 
 @click.command()
 @click.version_option("1.0")
-@click.option("--verbose", "-v", is_flag=True, help="Enables verbose mode.")
-@click.option("--dry-run", "-n", is_flag=True, help="Do not modify anything.")
-@click.option('--config', "-f", default=CONFIG, help='File name to use instead of `%s`'%CONFIG)
-@click.option('--switch', "-s", help="Use existing switch")
-def main(verbose, dry_run, config, switch):
+@click.option('--verbose', '-v', is_flag=True, help='Enables verbose mode.')
+@click.option('--dry-run', '-n', is_flag=True, help='Do not modify anything.')
+@click.option('--config', '-f', default=CONFIG, help='File name to use instead of `%s`'%CONFIG)
+@click.option('--jobs','-j', type=int, help='Set the maximal number of concurrent jobs to use')
+@click.option('--switch', '-s', help='Use existing switch')
+def main(verbose, dry_run, config, jobs, switch):
     cfg = load_config(verbose, config)
     opam_check(verbose)
     switches = opam_get_switches(verbose)
@@ -303,7 +307,7 @@ def main(verbose, dry_run, config, switch):
 
     opam_pin_packages(verbose, dry_run, switch, cfg.get('dependencies', []))
     
-    opam_install_packages(verbose, dry_run, switch, cfg.get('dependencies', []))
+    opam_install_packages(verbose, dry_run, jobs, switch, cfg.get('dependencies', []))
     
     for d in cfg.get('extra-deps', []):
         p = d['path']
