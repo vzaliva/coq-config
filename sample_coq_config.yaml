@@ -3,7 +3,6 @@
 
 opam:
   switch: helix
-#  sandboxing: no
   compiler: 4.11.1+flambda
 
 repositories:

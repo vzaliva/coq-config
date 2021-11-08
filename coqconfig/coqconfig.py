@@ -24,10 +24,6 @@ SCHEMA = {
                 'required': True,
                 'type': 'string',
             },
-            'sandboxing': {
-                'required': False,
-                'type': 'boolean',
-            },
             'compiler': {
                 'required': True,
                 'type': 'string',
@@ -152,13 +148,10 @@ def load_config(verbose, cfgfile):
         print("Error reading '%s'" % cfgfile)
         sys.exit(1)
 
-def opam_switch_create(verbose, dry_run, switch, compiler, sandboxing):
+def opam_switch_create(verbose, dry_run, switch, compiler):
     if verbose:
         print("Creating switch '%s'" % switch)
-    cmd = ["opam", "switch", "create", "--no-switch"]
-    if not sandboxing:
-        cmd.append("--disable-sandboxing")
-    cmd.extend([switch, compiler])
+    cmd = ["opam", "switch", "create", "--no-switch", switch, compiler]
     try:
         if dry_run:
             print("DRY RUN: %s" % " ".join(cmd))
@@ -294,9 +287,7 @@ def main(verbose, dry_run, config, jobs, switch):
             if verbose:
                 print("Switch '%s' found" % switch)
         else:
-            p = cfg['opam']
-            sb = p.get('sandboxing', True)
-            opam_switch_create(verbose, dry_run, switch, cfg['opam']['compiler'], sb)
+            opam_switch_create(verbose, dry_run, switch, cfg['opam']['compiler'])
     else:
         if switch in switches:
             if verbose:
